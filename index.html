@@ -1151,7 +1151,7 @@ font-size:.72rem;color:rgba(220,210,255,.5);text-align:center;max-width:560px}
 ```
 <div style="padding:22px 20px">
   <!-- Google -->
-  <button onclick="doAuthGoogle()" style="
+  <button id="btnGoogle" onclick="doAuthGoogle()" style="
     width:100%;padding:11px;margin-bottom:12px;
     display:flex;align-items:center;justify-content:center;gap:10px;
     background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.16);
@@ -1242,9 +1242,22 @@ font-size:.72rem;color:rgba(220,210,255,.5);text-align:center;max-width:560px}
 
   </div>
 
+```
+  <!-- Invité -->
+  <div style="margin-top:10px">
+    <button onclick="doAuthAnon()" style="
+      width:100%;padding:9px;
+      background:transparent;border:1px solid rgba(255,255,255,.1);
+      border-radius:4px;cursor:pointer;font-family:'Cinzel',serif;
+      font-size:.48rem;letter-spacing:.12em;color:rgba(255,255,255,.4);
+      text-transform:uppercase;transition:all .2s;
+    ">👤 Continuer en Invité — Gratuit</button>
+  </div>
+```
+
   <div style="margin-top:16px;font-family:'IM Fell English',serif;font-style:italic;
-    font-size:.58rem;color:rgba(200,180,255,.24);text-align:center">
-    Démo locale · Données en localStorage · Connexion simulée
+    font-size:.58rem;color:rgba(200,180,255,.28);text-align:center">
+    Firebase Auth · Données sécurisées Firestore
   </div>
 </div>
 
@@ -1607,6 +1620,222 @@ font-size:.72rem;color:rgba(220,210,255,.5);text-align:center;max-width:560px}
 
 <div id="cover" style="display:none"></div>
 
+<!-- ════ MODAL PARAMÈTRES ════ -->
+
+<div id="modalParams" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,5,.97);backdrop-filter:blur(16px);align-items:center;justify-content:center;padding:16px;">
+  <div style="width:100%;max-width:340px;background:rgba(6,3,20,.98);border:1px solid rgba(255,215,0,.22);border-radius:8px;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,215,0,.1)">
+      <span style="font-family:'Cinzel Decorative',cursive;font-size:.68rem;color:var(--gold);letter-spacing:.2em">⚙ PARAMÈTRES</span>
+      <button onclick="document.getElementById('modalParams').style.display='none'" style="background:transparent;border:1px solid rgba(255,80,100,.3);color:rgba(255,80,100,.6);font-family:'Cinzel',serif;font-size:.5rem;padding:3px 8px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+      <div>
+        <div style="font-family:'Cinzel',serif;font-size:.44rem;letter-spacing:.2em;color:rgba(255,215,0,.35);text-transform:uppercase;margin-bottom:8px">🎨 Apparence</div>
+        <div style="display:flex;gap:6px">
+          <button id="btnDark" onclick="setTheme('dark')" style="flex:1;padding:8px;font-family:'Cinzel',serif;font-size:.46rem;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.5);color:var(--gold);cursor:pointer;border-radius:3px">🌙 Dark</button>
+          <button id="btnLight" onclick="setTheme('light')" style="flex:1;padding:8px;font-family:'Cinzel',serif;font-size:.46rem;background:transparent;border:1px solid rgba(255,215,0,.2);color:rgba(255,215,0,.45);cursor:pointer;border-radius:3px">☀️ Light</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'Cinzel',serif;font-size:.44rem;letter-spacing:.2em;color:rgba(255,215,0,.35);text-transform:uppercase;margin-bottom:8px">🌐 Langue</div>
+        <div style="display:flex;gap:6px">
+          <button id="btnFR" onclick="setLangApp('fr')" style="flex:1;padding:8px;font-family:'Cinzel',serif;font-size:.46rem;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.5);color:var(--gold);cursor:pointer;border-radius:3px">🇫🇷 Français</button>
+          <button id="btnEN" onclick="setLangApp('en')" style="flex:1;padding:8px;font-family:'Cinzel',serif;font-size:.46rem;background:transparent;border:1px solid rgba(255,215,0,.2);color:rgba(255,215,0,.45);cursor:pointer;border-radius:3px">🇬🇧 English</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'Cinzel',serif;font-size:.44rem;letter-spacing:.2em;color:rgba(255,215,0,.35);text-transform:uppercase;margin-bottom:8px">👤 Compte</div>
+        <div id="paramUserInfo" style="font-family:'IM Fell English',serif;font-style:italic;font-size:.6rem;color:rgba(200,180,255,.5);margin-bottom:8px;padding:6px 8px;border:1px solid rgba(255,215,0,.08);border-radius:3px">Chargement...</div>
+        <button onclick="confirmReset()" style="width:100%;padding:9px;font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;background:rgba(255,68,102,.06);border:1px solid rgba(255,68,102,.3);color:rgba(255,68,102,.7);cursor:pointer;border-radius:3px;margin-bottom:6px">🔄 Réinitialiser le compte</button>
+        <button onclick="doSignOut()" style="width:100%;padding:9px;font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;background:transparent;border:1px solid rgba(255,215,0,.2);color:rgba(255,215,0,.45);cursor:pointer;border-radius:3px">🚪 Se déconnecter</button>
+      </div>
+      <div>
+        <div style="font-family:'Cinzel',serif;font-size:.44rem;letter-spacing:.2em;color:rgba(255,215,0,.35);text-transform:uppercase;margin-bottom:8px">💎 Abonnement</div>
+        <div id="paramSubStatus" style="font-family:'IM Fell English',serif;font-style:italic;font-size:.58rem;color:rgba(200,180,255,.45);margin-bottom:8px;padding:6px 8px;border:1px solid rgba(255,215,0,.08);border-radius:3px">Gratuit — Pages 1 à 100</div>
+        <button onclick="document.getElementById('modalParams').style.display='none';document.getElementById('paywall').style.display='flex'" style="width:100%;padding:9px;font-family:'Cinzel Decorative',cursive;font-size:.48rem;background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,215,0,.04));border:1px solid rgba(255,215,0,.45);color:var(--gold);cursor:pointer;border-radius:3px">⚔️ Débloquer Premium</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ FIREBASE SDK ════ -->
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  signInAnonymously, onAuthStateChanged, signOut, updateProfile
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBWYF1m5Su0L2uiTjR_43TY5FBBpxRSxRI",
+  authDomain: "pawaw-bd-animate-rp-ebook-game.firebaseapp.com",
+  projectId: "pawaw-bd-animate-rp-ebook-game",
+  storageBucket: "pawaw-bd-animate-rp-ebook-game.firebasestorage.app",
+  messagingSenderId: "956353744122",
+  appId: "1:956353744122:web:0fd571806ce3590a53cd43"
+};
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+const gp   = new GoogleAuthProvider();
+
+window._fbAuth = auth; window._fbDb = db; window._fbGP = gp;
+window._fbSignInWithPopup = signInWithPopup;
+window._fbSignInWithRedirect = signInWithRedirect;
+window._fbCreateUser = createUserWithEmailAndPassword;
+window._fbSignInEmail = signInWithEmailAndPassword;
+window._fbSignInAnon = signInAnonymously;
+window._fbSignOut = signOut;
+window._fbDoc = doc; window._fbSetDoc = setDoc; window._fbGetDoc = getDoc;
+window._fbServerTimestamp = serverTimestamp;
+window._fbUpdateProfile = updateProfile;
+
+onAuthStateChanged(auth, async user => {
+  window._fbUser = user || null;
+  if (user) {
+    try {
+      const snap = await getDoc(doc(db,'users',user.uid));
+      if (snap.exists()) {
+        const d = snap.data();
+        window._fbCharData = d.charData || null;
+        window._fbSubStatus = d.subStatus || 'free';
+        window._fbIsUnlocked = (d.subStatus === 'premium' || d.subStatus === 'lifetime');
+        if (window._fbIsUnlocked) { isUnlocked = true; }
+      }
+    } catch(e) {}
+  }
+  if (typeof window.onFirebaseUser === 'function') window.onFirebaseUser(user);
+});
+
+getRedirectResult(auth).then(r => {
+  if (r && r.user && typeof window.onFirebaseUser === 'function') window.onFirebaseUser(r.user);
+}).catch(() => {});
+</script>
+
+<script>
+window.onFirebaseUser = function(user) {
+  if (!user) return;
+  const sa = document.getElementById('screenAuth');
+  if (sa && sa.style.display !== 'none') {
+    startUnlockAnim(user.displayName || user.email || 'Aventurier');
+  }
+  const pi = document.getElementById('paramUserInfo');
+  if (pi) pi.textContent = user.isAnonymous ? '👤 Invité anonyme' : (user.displayName || user.email || 'Connecté');
+};
+
+async function doAuthGoogle() {
+  const btn = document.getElementById('btnGoogle');
+  if (btn) { btn.textContent = '⏳...'; btn.disabled = true; }
+  try {
+    if (!window._fbAuth) { showAuthMsg('⚠ Firebase pas encore chargé, attendre 2s', false); if(btn){btn.textContent='🔍 Google';btn.disabled=false;} return; }
+    try { await window._fbSignInWithPopup(window._fbAuth, window._fbGP); }
+    catch(pe) {
+      if (pe.code==='auth/popup-blocked'||pe.code==='auth/popup-closed-by-user') {
+        await window._fbSignInWithRedirect(window._fbAuth, window._fbGP);
+      } else throw pe;
+    }
+  } catch(e) {
+    showAuthMsg('⚠ ' + (e.message||'Erreur Google'), false);
+    if (btn) { btn.textContent='🔍 Continuer avec Google'; btn.disabled=false; }
+  }
+}
+
+async function doAuthLogin() {
+  const p = document.getElementById('fldPseudo').value.trim();
+  const pw = document.getElementById('fldPass').value;
+  if (!p) { showAuthMsg('⚠ Entrer un email', false); return; }
+  if (!pw) { showAuthMsg('⚠ Entrer un mot de passe', false); return; }
+  try {
+    await window._fbSignInEmail(window._fbAuth, p, pw);
+    showAuthMsg('✓ Connexion réussie !', true);
+  } catch(e) {
+    const msg = e.code==='auth/user-not-found'?'Compte introuvable':e.code==='auth/wrong-password'?'Mot de passe incorrect':e.code==='auth/invalid-email'?'Email invalide':e.message;
+    showAuthMsg('⚠ ' + msg, false);
+  }
+}
+
+async function doAuthRegister() {
+  const p=document.getElementById('regPseudo').value.trim();
+  const em=document.getElementById('regEmail').value.trim();
+  const pw=document.getElementById('regPass').value;
+  if (!p) { showAuthMsg('⚠ Choisir un pseudo', false); return; }
+  if (!em) { showAuthMsg('⚠ Entrer un email', false); return; }
+  if (!pw||pw.length<6) { showAuthMsg('⚠ Mot de passe : 6+ caractères', false); return; }
+  try {
+    const cred = await window._fbCreateUser(window._fbAuth, em, pw);
+    await window._fbUpdateProfile(cred.user, {displayName: p});
+    showAuthMsg('✓ Compte créé ! Bienvenue ✦', true);
+  } catch(e) {
+    const msg = e.code==='auth/email-already-in-use'?'Email déjà utilisé':e.message;
+    showAuthMsg('⚠ ' + msg, false);
+  }
+}
+
+async function doAuthAnon() {
+  try {
+    if (!window._fbAuth) { showAuthMsg('⚠ Firebase pas encore chargé', false); return; }
+    await window._fbSignInAnon(window._fbAuth);
+  } catch(e) { showAuthMsg('⚠ ' + e.message, false); }
+}
+
+async function doSignOut() {
+  try {
+    if (window._fbAuth) await window._fbSignOut(window._fbAuth);
+  } catch(e) {}
+  document.getElementById('modalParams').style.display='none';
+  document.getElementById('shell').style.display='none';
+  document.getElementById('screenAuth').style.display='flex';
+  window._fbUser=null; window._fbIsUnlocked=false;
+}
+
+async function saveToFirestore(charData) {
+  if (!window._fbUser||!window._fbDb) { saveChar(); return; }
+  try {
+    await window._fbSetDoc(window._fbDoc(window._fbDb,'users',window._fbUser.uid),
+      {charData, updatedAt: window._fbServerTimestamp()},{merge:true});
+  } catch(e) {}
+  saveChar();
+}
+window.saveToFirestore = saveToFirestore;
+
+function confirmReset() {
+  if (!confirm('⚠ Réinitialiser ton personnage et progression ?')) return;
+  try { localStorage.removeItem('pawaw_char_v3'); localStorage.removeItem('pawaw_unlocked'); } catch(e){}
+  if (window._fbUser&&window._fbDb) {
+    window._fbSetDoc(window._fbDoc(window._fbDb,'users',window._fbUser.uid),{charData:null},{merge:true}).catch(()=>{});
+  }
+  doSignOut();
+}
+
+function openParams() {
+  const pi=document.getElementById('paramUserInfo');
+  if (pi) pi.textContent = window._fbUser ? (window._fbUser.isAnonymous?'👤 Invité anonyme':(window._fbUser.displayName||window._fbUser.email||'Connecté')) : 'Non connecté';
+  const ss=document.getElementById('paramSubStatus');
+  if (ss) ss.textContent = isUnlocked ? '💎 Premium actif — Accès complet' : '🆓 Gratuit — Pages 1 à 100';
+  document.getElementById('modalParams').style.display='flex';
+}
+
+function setTheme(t) {
+  document.body.setAttribute('data-theme',t);
+  document.getElementById('btnDark').style.background  = t==='dark'  ? 'rgba(255,215,0,.12)' : 'transparent';
+  document.getElementById('btnLight').style.background = t==='light' ? 'rgba(255,215,0,.12)' : 'transparent';
+  document.getElementById('btnDark').style.borderColor  = t==='dark'  ? 'rgba(255,215,0,.6)' : 'rgba(255,215,0,.2)';
+  document.getElementById('btnLight').style.borderColor = t==='light' ? 'rgba(255,215,0,.6)' : 'rgba(255,215,0,.2)';
+  try { localStorage.setItem('pawaw_theme',t); } catch(e) {}
+  if (t==='light') { document.body.style.background='#F0EBE0'; document.body.style.color='#1A1200'; }
+  else { document.body.style.background=''; document.body.style.color=''; }
+}
+
+function setLangApp(l) {
+  document.getElementById('btnFR').style.background = l==='fr' ? 'rgba(255,215,0,.12)' : 'transparent';
+  document.getElementById('btnEN').style.background = l==='en' ? 'rgba(255,215,0,.12)' : 'transparent';
+  try { localStorage.setItem('pawaw_lang',l); } catch(e) {}
+}
+</script>
+
 <!-- ══════════ APP ══════════ -->
 
 <div id="shell">
@@ -1619,7 +1848,7 @@ font-size:.72rem;color:rgba(220,210,255,.5);text-align:center;max-width:560px}
     <button class="tb-btn act">📖 Codex</button>
     <button class="tb-btn" onclick="showVia()">✨ ViA</button>
     <button class="tb-combat-btn" onclick="openCombat()">⚔️ Combat</button>
-    <button class="tb-btn" onclick="unlockDemo()">🔓 Démo+</button>
+    <button class="tb-btn" onclick="openParams()">⚙️ Params</button>
     <div class="tb-sep"></div>
     <div style="font-family:'Cinzel Decorative',cursive;font-size:.48rem;color:rgba(255,215,0,.3);letter-spacing:.22em;flex-shrink:0">PAWAW · AN 52</div>
     <div id="tbVideo">
@@ -1865,6 +2094,20 @@ font-size:.72rem;color:rgba(220,210,255,.5);text-align:center;max-width:560px}
   </div>
   <div style="padding:0 8px 4px"><button class="save-btn" onclick="saveChar()">💾 Sauvegarder</button></div>
 
+
+  <!-- ════ MAP QUÊTES ════ -->
+  <div class="menu-panel" id="mp-map">
+    <div style="font-family:'Cinzel Decorative',cursive;font-size:.52rem;color:rgba(255,215,0,.5);letter-spacing:.16em;margin-bottom:8px;text-align:center">🗺️ CARTE DES CYCLES</div>
+    <div id="mapContainer" style="width:100%;overflow-x:auto;overflow-y:auto">
+      <!-- rempli par buildMap() -->
+    </div>
+    <div style="margin-top:8px;padding:6px 0;border-top:1px solid rgba(255,215,0,.08)">
+      <div style="font-family:'Cinzel',serif;font-size:.42rem;color:rgba(255,215,0,.38);letter-spacing:.14em;margin-bottom:5px">QUÊTES ACTIVES</div>
+      <div id="questList" style="display:flex;flex-direction:column;gap:4px">
+        <!-- rempli par renderQuests() -->
+      </div>
+    </div>
+  </div>
   <!-- Menus -->
   <div class="menu-tabs">
     <button class="mtab act" onclick="switchMenu('id',this)">🧬 ID</button>
@@ -1875,6 +2118,7 @@ font-size:.72rem;color:rgba(220,210,255,.5);text-align:center;max-width:560px}
     <button class="mtab" onclick="switchMenu('depl',this)">🐴 Dépl</button>
     <button class="mtab" onclick="switchMenu('cap',this)">⚡ Cap</button>
     <button class="mtab" onclick="switchMenu('spec',this)">✨ Spéc</button>
+    <button class="mtab" onclick="switchMenu('map',this)">🗺️ Map</button>
   </div>
 
   <!-- IDENTITÉ -->
@@ -2511,13 +2755,7 @@ function showAuthMsg(msg, ok){
   el.style.color  = ok ? 'rgba(0,255,179,.8)' : 'rgba(255,68,102,.8)';
   el.textContent  = msg;
 }
-function doAuthGoogle(){
-  showAuthMsg('✓ Connexion Google simulée — démo locale', true);
-  const pseudo = 'Voyageur' + Math.floor(Math.random()*9999);
-  authUser = { pseudo, source:'google' };
-  try{ localStorage.setItem('pawaw_user', JSON.stringify(authUser)); }catch(e){}
-  setTimeout(()=>startUnlockAnim(pseudo), 900);
-}
+// doAuthGoogle → handled by Firebase module
 function doAuthLogin(){
   const p = document.getElementById('fldPseudo').value.trim();
   const pw = document.getElementById('fldPass').value;
@@ -3162,6 +3400,622 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowRight')goPage(1);if(e.key==='ArrowLeft')goPage(-1);
   if(e.key==='ArrowDown')nextPanel();if(e.key==='ArrowUp')prevPanel();
   if(e.key==='Escape'){closeVia();closeLb();}
+});
+</script>
+
+<!-- ════════════════════════════════════════════════════════
+  SYSTÈME MAP + QUÊTES + XP EXPONENTIEL + PERSO CSS 3D
+  v13 — Just Keff Tech Labs
+════════════════════════════════════════════════════════ -->
+
+<style>
+/* ── MAP CYCLES ────────────────────────────────── */
+.map-cycle{
+  border:1px solid rgba(255,215,0,.12);border-radius:5px;
+  padding:8px;margin-bottom:8px;background:rgba(255,215,0,.02);
+  transition:all .2s;
+}
+.map-cycle.current{border-color:rgba(255,215,0,.5);background:rgba(255,215,0,.05);
+  box-shadow:0 0 12px rgba(255,215,0,.1)}
+.map-cycle.locked{opacity:.35;filter:grayscale(.5)}
+.mc-title{font-family:'Cinzel Decorative',cursive;font-size:.5rem;color:var(--gold);
+  letter-spacing:.14em;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.mc-lock{font-size:.7rem;opacity:.5}
+.mc-pages{display:flex;gap:3px;margin-bottom:5px;flex-wrap:wrap}
+.mp-dot{width:18px;height:18px;border-radius:3px;font-family:'Cinzel',serif;
+  font-size:.35rem;display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,215,0,.2);color:rgba(255,215,0,.4);cursor:pointer;transition:all .2s}
+.mp-dot.done{background:rgba(255,215,0,.15);border-color:rgba(255,215,0,.6);color:var(--gold)}
+.mp-dot.active{background:rgba(0,245,255,.1);border-color:rgba(0,245,255,.6);color:var(--cyan);
+  box-shadow:0 0 6px rgba(0,245,255,.3);animation:dotPulse 1.5s ease-in-out infinite}
+.mp-dot.locked2{opacity:.2;cursor:default}
+@keyframes dotPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.mc-xp{font-family:'Cinzel',serif;font-size:.4rem;color:rgba(200,180,255,.4);
+  letter-spacing:.12em;margin-bottom:4px}
+
+/* ── QUÊTE ─────────────────────────────────────── */
+.quest-card{
+  border:1px solid;border-radius:4px;padding:6px 8px;
+  background:rgba(3,2,14,.8);transition:all .2s;cursor:pointer;
+}
+.quest-card:hover{transform:translateX(2px)}
+.quest-card.main{border-color:rgba(255,215,0,.3)}
+.quest-card.side{border-color:rgba(0,245,255,.2)}
+.quest-card.daily{border-color:rgba(0,255,179,.2)}
+.quest-card.done{opacity:.4;border-color:rgba(255,255,255,.1)}
+.qc-top{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.qc-icon{font-size:.9rem;flex-shrink:0}
+.qc-name{font-family:'Cinzel',serif;font-size:.44rem;color:rgba(220,210,255,.8);flex:1}
+.qc-xp{font-family:'Cinzel',serif;font-size:.4rem;color:var(--gold);flex-shrink:0}
+.qc-desc{font-family:'IM Fell English',serif;font-style:italic;font-size:.48rem;
+  color:rgba(200,180,255,.38);line-height:1.4}
+.qc-prog{width:100%;height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:4px}
+.qc-pfill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--gold2),var(--gold));
+  transition:width .5s ease}
+
+/* ── CSS 3D CHARACTER MORPHING ─────────────────── */
+#char3DWrap{
+  width:100%;height:200px;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  perspective:600px;overflow:hidden;
+}
+.char3d-body{
+  width:80px;height:140px;position:relative;
+  transform-style:preserve-3d;
+  animation:char3dFloat 4s ease-in-out infinite;
+  transition:all .6s cubic-bezier(.4,0,.2,1);
+}
+@keyframes char3dFloat{0%,100%{transform:translateY(0) rotateY(-8deg)}50%{transform:translateY(-10px) rotateY(8deg)}}
+
+/* Torse */
+.cb-torso{
+  position:absolute;left:50%;top:30%;transform:translateX(-50%);
+  width:var(--torso-w,44px);height:var(--torso-h,52px);
+  background:var(--robe-col,#1A0A3E);
+  border-radius:4px 4px 8px 8px;
+  box-shadow:4px 4px 12px rgba(0,0,0,.6),inset -4px 0 8px rgba(0,0,0,.3);
+  border:1px solid var(--gem-col,#FFD700);
+  transition:all .5s ease;
+}
+/* Tête */
+.cb-head{
+  position:absolute;left:50%;top:6%;transform:translateX(-50%);
+  width:var(--head-w,32px);height:var(--head-h,32px);
+  background:var(--skin-col,#E8C48E);
+  border-radius:50% 50% 45% 45%;
+  box-shadow:0 0 var(--glow-r,15px) var(--glow-col,rgba(255,215,0,.4));
+  transition:all .5s ease;overflow:hidden;
+}
+/* Yeux */
+.cb-eye{position:absolute;top:40%;width:6px;height:6px;background:#fff;border-radius:50%}
+.cb-eye::after{content:'';position:absolute;inset:1px;background:var(--gem-col,#FFD700);border-radius:50%}
+.cb-eye.left{left:20%}.cb-eye.right{right:20%}
+/* Cheveux */
+.cb-hair{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:105%;height:55%;
+  background:var(--hair-col,#3A1A6E);
+  border-radius:50% 50% 0 0;
+  box-shadow:0 -2px 8px rgba(0,0,0,.4);
+  transition:all .5s ease;
+}
+/* Halo */
+.cb-halo{
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  width:40px;height:10px;
+  border:2px solid var(--gem-col,#FFD700);
+  border-radius:50%;
+  box-shadow:0 0 10px var(--gem-col,rgba(255,215,0,.6));
+  display:none;animation:haloSpin 3s linear infinite;
+}
+@keyframes haloSpin{to{transform:translateX(-50%) rotateX(70deg) rotateZ(360deg)}}
+/* Ailes */
+.cb-wing{
+  position:absolute;top:28%;width:38px;height:55px;
+  background:var(--wing-col,rgba(200,220,255,.12));
+  display:none;
+  transition:all .5s;
+}
+.cb-wing.left{right:calc(100% - 8px);border-radius:60% 0 0 60%;
+  transform-origin:right center;animation:wingL 2s ease-in-out infinite}
+.cb-wing.right{left:calc(100% - 8px);border-radius:0 60% 60% 0;
+  transform-origin:left center;animation:wingR 2s ease-in-out infinite}
+@keyframes wingL{0%,100%{transform:rotate(-15deg) scaleX(.8)}50%{transform:rotate(-30deg) scaleX(1)}}
+@keyframes wingR{0%,100%{transform:rotate(15deg) scaleX(.8)}50%{transform:rotate(30deg) scaleX(1)}}
+/* Bras */
+.cb-arm{
+  position:absolute;top:33%;
+  width:12px;height:var(--arm-h,42px);
+  background:var(--robe-col,#1A0A3E);
+  border-radius:6px;
+  box-shadow:2px 2px 6px rgba(0,0,0,.4);
+  transition:all .5s ease;
+}
+.cb-arm.left{right:calc(100%);transform-origin:top center;animation:armL 4s ease-in-out infinite}
+.cb-arm.right{left:calc(100%);transform-origin:top center;animation:armR 4s ease-in-out infinite}
+@keyframes armL{0%,100%{transform:rotate(10deg)}50%{transform:rotate(-5deg)}}
+@keyframes armR{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(5deg)}}
+/* Jambes */
+.cb-legs{
+  position:absolute;left:50%;transform:translateX(-50%);
+  bottom:0;display:flex;gap:4px;top:calc(30% + var(--torso-h,52px));
+}
+.cb-leg{
+  width:14px;height:var(--leg-h,36px);
+  background:var(--pant-col,#0A0520);
+  border-radius:0 0 4px 4px;
+  box-shadow:2px 2px 6px rgba(0,0,0,.5);
+  transition:all .5s ease;
+}
+/* Bottes */
+.cb-boot{
+  width:16px;height:10px;
+  background:var(--boot-col,#2A1200);
+  border-radius:2px 2px 4px 4px;margin-top:1px;
+  transition:all .5s ease;
+}
+/* Implant cyber */
+.cb-implant{
+  position:absolute;top:20%;right:-3px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--cyan);box-shadow:0 0 8px var(--cyan);
+  display:none;animation:impPulse 1s ease-in-out infinite;
+}
+@keyframes impPulse{0%,100%{opacity:.5;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+/* Particules de morphing */
+.morph-particle{
+  position:absolute;width:3px;height:3px;border-radius:50%;
+  background:var(--gem-col,#FFD700);pointer-events:none;
+  animation:morphPart .6s ease-out forwards;
+}
+@keyframes morphPart{
+  0%{opacity:1;transform:translate(0,0) scale(1)}
+  100%{opacity:0;transform:translate(var(--px),var(--py)) scale(0)}
+}
+/* Âge skin effect */
+.char3d-body[data-age="young"] .cb-torso{transform:translateX(-50%) scale(.88)}
+.char3d-body[data-age="old"] .cb-torso{transform:translateX(-50%) scale(1.08)}
+.char3d-body[data-age="old"] .cb-head{filter:brightness(.85) saturate(.7)}
+
+/* ── XP BAR UPDATE ─────────────────────────────── */
+#xpBarV2{
+  width:100%;height:18px;position:relative;
+  border:1.5px solid rgba(255,215,0,.3);border-radius:10px;overflow:hidden;
+  background:rgba(4,2,14,.8);
+}
+.xpv2-fill{
+  height:100%;border-radius:8px;
+  background:linear-gradient(90deg,#1A0A30,#4A1A80,#8A3AE0,#AA66FF,#FFD700);
+  background-size:200% 100%;animation:liqShim 3s linear infinite;
+  transition:width .8s cubic-bezier(.4,0,.2,1);
+}
+.xpv2-txt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Cinzel',serif;font-size:.4rem;color:rgba(255,255,255,.8);
+  text-shadow:0 0 4px rgba(0,0,0,.9);pointer-events:none}
+</style>
+
+<script>
+// ════════════════════════════════════════════════════════
+// XP EXPONENTIEL — paliers exponentiels par cycle
+// ════════════════════════════════════════════════════════
+function xpRequired(level) {
+  // Formule: 100 × 1.35^level (arrondi)
+  // Lv 0→1: 100 XP | Lv 9→10: ~2000 | Lv 49→50: ~50k | Lv 99→100: ~500k
+  if (level <= 0) return 100;
+  return Math.round(100 * Math.pow(1.35, level));
+}
+
+function updateXPDisplay() {
+  const needed = xpRequired(ageLevel);
+  const pct = Math.min(Math.round((xpVal / needed) * 100), 100);
+
+  // Barre XP originale
+  const bar = document.getElementById('xpBar');
+  const txt = document.getElementById('xpText');
+  const lvl = document.getElementById('xpLvl');
+  const pctEl = document.getElementById('xpPct');
+  if (bar) bar.style.width = pct + '%';
+  if (txt) txt.textContent = xpVal.toLocaleString() + ' / ' + needed.toLocaleString() + ' WA';
+  if (lvl) lvl.textContent = 'Âge : ' + ageLevel;
+  if (pctEl) pctEl.textContent = pct + '%';
+
+  // Vérifier level up
+  while (xpVal >= xpRequired(ageLevel) && ageLevel < 100) {
+    xpVal -= xpRequired(ageLevel);
+    ageLevel++;
+    onLevelUp(ageLevel);
+  }
+
+  // Mettre à jour avatar âge
+  updateAvatarAge();
+}
+
+function onLevelUp(newLevel) {
+  // Son + flash
+  const flash = document.createElement('div');
+  flash.style.cssText = 'position:fixed;inset:0;z-index:999;pointer-events:none;' +
+    'background:rgba(255,215,0,.15);animation:lvlFlash .5s ease forwards;';
+  flash.innerHTML = '<style>@keyframes lvlFlash{0%{opacity:1}100%{opacity:0}}</style>';
+
+document.body.appendChild(flash);
+setTimeout(() => document.body.removeChild(flash), 600);
+
+showVia(`⭐ Niveau ${newLevel} atteint ! ${ newLevel % 10 === 0 ? '🏆 Nouveau cycle débloqué !' : newLevel % 5 === 0 ? '⚔️ Nouvelles quêtes disponibles !' : '💪 Tu grandis sur VitA.' }`);
+
+// Débloquer cycle si multiple de 10
+if (newLevel % 10 === 0) unlockCycle(Math.floor(newLevel / 10));
+
+// Régénérer map
+buildMap();
+renderQuests();
+// Morphing personnage
+spawnMorphParticles();
+updateAvatarAge();
+}
+
+function updateAvatarAge() {
+const body = document.querySelector(’.char3d-body’);
+if (!body) return;
+body.dataset.age = ageLevel < 20 ? ‘young’ : ageLevel > 60 ? ‘old’ : ‘normal’;
+}
+
+// ════════════════════════════════════════════════════════
+// MAP DES CYCLES — 10 cycles × 10 niveaux × 5 pages/quêtes
+// ════════════════════════════════════════════════════════
+const CYCLES = [
+{ id:0, name:‘Cycle I · Éveil’,      minLvl:0,  pages:5, color:‘rgba(255,215,0,.6)’,  icon:‘🌱’ },
+{ id:1, name:‘Cycle II · Initiation’,minLvl:10, pages:5, color:‘rgba(0,245,255,.6)’,  icon:‘⚡’ },
+{ id:2, name:‘Cycle III · Épreuve’,  minLvl:20, pages:5, color:‘rgba(204,136,255,.6)’,icon:‘🔥’ },
+{ id:3, name:‘Cycle IV · Ascension’, minLvl:30, pages:5, color:‘rgba(0,255,179,.6)’,  icon:‘🌊’ },
+{ id:4, name:‘Cycle V · Confluence’, minLvl:40, pages:5, color:‘rgba(255,68,102,.6)’, icon:‘⚔️’ },
+{ id:5, name:‘Cycle VI · Révélation’,minLvl:50, pages:5, color:‘rgba(255,215,0,.8)’,  icon:‘✨’ },
+{ id:6, name:‘Cycle VII · Fracture’, minLvl:60, pages:5, color:‘rgba(0,245,255,.8)’,  icon:‘💀’ },
+{ id:7, name:‘Cycle VIII · Fusion’,  minLvl:70, pages:5, color:‘rgba(204,136,255,.8)’,icon:‘🌌’ },
+{ id:8, name:‘Cycle IX · Transcendance’,minLvl:80,pages:5,color:‘rgba(255,215,0,1)’, icon:‘👁️’ },
+{ id:9, name:‘Cycle X · @Omega’,     minLvl:90, pages:5, color:‘rgba(255,255,255,1)’, icon:‘⭕’ },
+];
+
+// Quêtes par cycle — quantité croissante
+const QUEST_TEMPLATES = {
+0: [ // Cycle I — 3 quêtes
+{id:‘c0q1’,name:‘Le Premier Souffle’,icon:‘🌱’,type:‘main’,
+desc:‘Rencontre 1 personnage de chaque faction.’,xp:150,req:0,progress:0,goal:4},
+{id:‘c0q2’,name:‘Premier Combat’,icon:‘⚔️’,type:‘side’,
+desc:‘Gagne ton premier combat sur VitA.’,xp:100,req:0,progress:0,goal:1},
+{id:‘c0q3’,name:‘Découverte du PAWAW’,icon:‘✨’,type:‘daily’,
+desc:‘Lis 5 pages du Codex.’,xp:80,req:0,progress:0,goal:5},
+],
+1: [ // Cycle II — 5 quêtes
+{id:‘c1q1’,name:‘L'Appel de la Faction’,icon:‘⚡’,type:‘main’,
+desc:‘Prouve ta valeur à ta faction.’,xp:300,req:10,progress:0,goal:3},
+{id:‘c1q2’,name:‘Combat × 3’,icon:‘⚔️’,type:‘side’,
+desc:‘Gagne 3 combats consécutifs.’,xp:200,req:10,progress:0,goal:3},
+{id:‘c1q3’,name:‘Exploration’,icon:‘🗺️’,type:‘side’,
+desc:‘Découvre 2 nouvelles zones.’,xp:150,req:10,progress:0,goal:2},
+{id:‘c1q4’,name:‘Collecte PAWAW’,icon:‘💎’,type:‘daily’,
+desc:‘Accumule 500 WA en une session.’,xp:120,req:10,progress:0,goal:500},
+{id:‘c1q5’,name:‘Équipement Initial’,icon:‘🛡️’,type:‘side’,
+desc:‘Équipe 3 slots de ton armure.’,xp:180,req:10,progress:0,goal:3},
+],
+2: [ // Cycle III — 7 quêtes
+{id:‘c2q1’,name:‘L'Épreuve du Feu’,icon:‘🔥’,type:‘main’,
+desc:‘Survie à 5 combats difficiles.’,xp:500,req:20,progress:0,goal:5},
+{id:‘c2q2’,name:‘Alliance Temporaire’,icon:‘🤝’,type:‘main’,
+desc:‘Complète une quête avec un allié.’,xp:400,req:20,progress:0,goal:1},
+{id:‘c2q3’,name:‘Maîtrise de Classe’,icon:‘📚’,type:‘side’,
+desc:‘Atteins le niveau de maîtrise 50.’,xp:300,req:20,progress:0,goal:50},
+{id:‘c2q4’,name:‘Chasse aux Trésors’,icon:‘💰’,type:‘side’,
+desc:‘Trouve 3 objets rares.’,xp:250,req:20,progress:0,goal:3},
+{id:‘c2q5’,name:‘Entraînement Intensif’,icon:‘💪’,type:‘daily’,
+desc:‘Gagne 1000 WA en une session.’,xp:200,req:20,progress:0,goal:1000},
+{id:‘c2q6’,name:‘Le Gardien du Cycle’,icon:‘🏰’,type:‘side’,
+desc:‘Défait le boss du Cycle III.’,xp:600,req:20,progress:0,goal:1},
+{id:‘c2q7’,name:‘Mémoire Ancestrale’,icon:‘📖’,type:‘side’,
+desc:‘Lis 15 pages du Codex.’,xp:180,req:20,progress:0,goal:15},
+],
+3: [ // Cycle IV — 8 quêtes
+{id:‘c3q1’,name:‘Confluence des Forces’,icon:‘🌊’,type:‘main’,
+desc:‘Maîtrise les 4 éléments du PAWAW.’,xp:800,req:30,progress:0,goal:4},
+{id:‘c3q2’,name:‘Duel Légendaire’,icon:‘⚔️’,type:‘main’,
+desc:‘Défait un adversaire de niveau 35+.’,xp:700,req:30,progress:0,goal:1},
+{id:‘c3q3’,name:‘Territoire’,icon:‘🚩’,type:‘side’,
+desc:‘Contrôle 2 zones de ta faction.’,xp:500,req:30,progress:0,goal:2},
+{id:‘c3q4’,name:‘Artisan PAWAW’,icon:‘⚒️’,type:‘side’,
+desc:‘Fabrique 2 objets avec ta profession.’,xp:400,req:30,progress:0,goal:2},
+{id:‘c3q5’,name:‘Réseau d'Alliés’,icon:‘👥’,type:‘side’,
+desc:‘Forme des alliances avec 3 joueurs.’,xp:350,req:30,progress:0,goal:3},
+{id:‘c3q6’,name:‘Marathon de Combat’,icon:‘🏆’,type:‘daily’,
+desc:‘Gagne 10 combats en une session.’,xp:600,req:30,progress:0,goal:10},
+{id:‘c3q7’,name:‘Codex Profond’,icon:‘📜’,type:‘side’,
+desc:‘Lis 25 pages et mémorise 5 secrets.’,xp:300,req:30,progress:0,goal:25},
+{id:‘c3q8’,name:‘L'Éclat du Cycle’,icon:‘💎’,type:‘main’,
+desc:‘Récupère le cristal du Cycle IV.’,xp:1000,req:30,progress:0,goal:1},
+],
+// Cycles 4-9 suivent la même logique — plus de quêtes, plus d’XP
+};
+// Générer les cycles 4-9 automatiquement
+for (let ci = 4; ci <= 9; ci++) {
+const base = 1000 * Math.pow(1.5, ci);
+const count = 8 + ci;
+QUEST_TEMPLATES[ci] = [];
+const types = [‘main’,‘side’,‘daily’,‘side’,‘main’,‘side’,‘daily’,‘side’,‘side’,‘main’,‘side’,‘daily’];
+const icons  = [‘⭐’,‘⚔️’,‘🔥’,‘🌊’,‘💎’,‘📚’,‘🏆’,‘✨’,‘💀’,‘🌌’,‘👁️’,‘⭕’];
+for (let qi = 0; qi < count; qi++) {
+QUEST_TEMPLATES[ci].push({
+id:`c${ci}q${qi+1}`,
+name:`Quête ${['Principale','Secondaire','Journalière','Épique','Légendaire'][qi%5]} ${qi+1}`,
+icon: icons[qi % icons.length],
+type: types[qi % types.length],
+desc: `Défi du Cycle ${['VII','VIII','IX','X','XI'][ci-4]} — Niveau ${ci*10}+.`,
+xp: Math.round(base * (1 + qi * 0.3)),
+req: ci * 10,
+progress: 0,
+goal: 1 + qi * 2
+});
+}
+}
+
+let questProgress = {}; // { questId: progress }
+let unlockedCycles = [0]; // cycles débloqués
+let currentCycle = 0;
+
+function unlockCycle(cycleId) {
+if (!unlockedCycles.includes(cycleId)) unlockedCycles.push(cycleId);
+}
+
+function buildMap() {
+const container = document.getElementById(‘mapContainer’);
+if (!container) return;
+
+const currentCycleId = Math.floor(ageLevel / 10);
+
+let html = ‘’;
+CYCLES.forEach(cyc => {
+const isUnlocked = ageLevel >= cyc.minLvl;
+const isCurrent  = currentCycleId === cyc.id;
+const progressInCycle = Math.max(0, ageLevel - cyc.minLvl);
+
+```
+let pagesHtml = '';
+for (let p = 0; p < cyc.pages; p++) {
+  const pageNum = cyc.minLvl + p * 2;
+  const isDone   = ageLevel > cyc.minLvl + p * 2;
+  const isActive = !isDone && isUnlocked && p === Math.min(progressInCycle, cyc.pages-1);
+  const isLocked = !isUnlocked || (!isDone && !isActive);
+  const cls = isDone ? 'done' : isActive ? 'active' : 'locked2';
+  pagesHtml += `<div class="mp-dot ${cls}" title="Page ${pageNum}" onclick="goToMapPage(${pageNum})">${isDone?'✓':isActive?'▶':p+1}</div>`;
+}
+
+const questCount = (QUEST_TEMPLATES[cyc.id]||[]).length;
+const doneCount  = (QUEST_TEMPLATES[cyc.id]||[]).filter(q => (questProgress[q.id]||0) >= q.goal).length;
+
+html += `
+  <div class="map-cycle ${isCurrent?'current':''} ${!isUnlocked?'locked':''}">
+    <div class="mc-title" style="color:${cyc.color}">
+      ${cyc.icon} ${cyc.name}
+      ${!isUnlocked ? '<span class="mc-lock">🔒 Niv.'+cyc.minLvl+'</span>' : ''}
+    </div>
+    <div class="mc-pages">${pagesHtml}</div>
+    <div class="mc-xp">
+      Quêtes: ${doneCount}/${questCount} ·
+      XP requis: ${xpRequired(cyc.minLvl).toLocaleString()} WA
+    </div>
+  </div>
+`;
+```
+
+});
+
+container.innerHTML = html;
+}
+
+function goToMapPage(pageNum) {
+const target = Math.max(0, Math.floor(pageNum / 6));
+renderPage(Math.min(target, PAGES.length-1), 1);
+switchMenu(‘map’, null);
+}
+
+function renderQuests() {
+const list = document.getElementById(‘questList’);
+if (!list) return;
+
+const cycleId = Math.min(Math.floor(ageLevel / 10), 9);
+const quests  = QUEST_TEMPLATES[cycleId] || [];
+const active  = quests.filter(q => ageLevel >= q.req && (questProgress[q.id]||0) < q.goal);
+const display = active.slice(0, 5); // Max 5 visibles
+
+if (!display.length) {
+list.innerHTML = ‘<div style="font-family:\'IM Fell English\',serif;font-style:italic;font-size:.52rem;color:rgba(200,180,255,.3);text-align:center;padding:8px">Aucune quête active · Combat ou explore</div>’;
+return;
+}
+
+list.innerHTML = display.map(q => {
+const prog = questProgress[q.id] || 0;
+const pct  = Math.min(100, Math.round((prog / q.goal) * 100));
+return `<div class="quest-card ${q.type}" onclick="doQuestAction('${q.id}')"> <div class="qc-top"> <span class="qc-icon">${q.icon}</span> <span class="qc-name">${q.name}</span> <span class="qc-xp">+${q.xp.toLocaleString()} WA</span> </div> <div class="qc-desc">${q.desc} (${prog}/${q.goal})</div> <div class="qc-prog"><div class="qc-pfill" style="width:${pct}%"></div></div> </div>`;
+}).join(’’);
+}
+
+function doQuestAction(questId) {
+// Trouver la quête
+let quest = null;
+for (const cyc of Object.values(QUEST_TEMPLATES)) {
+const found = cyc.find(q => q.id === questId);
+if (found) { quest = found; break; }
+}
+if (!quest) return;
+
+questProgress[questId] = (questProgress[questId] || 0) + 1;
+
+if (questProgress[questId] >= quest.goal) {
+// Quête terminée !
+const xpGain = quest.xp;
+xpVal += xpGain;
+updateXPDisplay();
+saveChar();
+showVia(`✅ Quête "${quest.name}" accomplie ! +${xpGain.toLocaleString()} WA alchimiques !`);
+spawnMorphParticles();
+} else {
+showVia(`📍 Progression : ${questProgress[questId]}/${quest.goal} — Continue !`);
+}
+renderQuests();
+try { localStorage.setItem(‘pawaw_quests’, JSON.stringify(questProgress)); } catch(e) {}
+}
+
+// ════════════════════════════════════════════════════════
+// CSS 3D CHARACTER — buildChar3D + morphing
+// ════════════════════════════════════════════════════════
+function buildChar3D(container) {
+if (!container) return;
+const race = RACES[cs.faction]?.[cs.raceIdx] || null;
+const r    = race || {skin:’#E8C48E’,hair:’#3A1A6E’,robe:’#1A0A3E’,pant:’#0A0520’,boot:’#2A1200’,gem:’#FFD700’,glow:‘rgba(255,215,0,.5)’,wings:false,halo:false};
+
+const ageStage = ageLevel < 20 ? ‘young’ : ageLevel > 60 ? ‘old’ : ‘normal’;
+const torsoW   = ageStage === ‘old’ ? 50 : ageStage === ‘young’ ? 38 : 44;
+const torsoH   = ageStage === ‘old’ ? 58 : ageStage === ‘young’ ? 44 : 52;
+const headW    = ageStage === ‘old’ ? 36 : ageStage === ‘young’ ? 28 : 32;
+const armH     = ageStage === ‘old’ ? 46 : ageStage === ‘young’ ? 36 : 42;
+const legH     = ageStage === ‘old’ ? 40 : ageStage === ‘young’ ? 30 : 36;
+
+container.innerHTML = `
+<div class="char3d-body" data-age="${ageStage}"
+style="--skin-col:${r.skin};--hair-col:${r.hair};--robe-col:${r.robe};
+--pant-col:${r.pant};--boot-col:${r.boot};--gem-col:${r.gem};
+--glow-col:${r.glow};--glow-r:${r.halo?'20px':'12px'};
+--torso-w:${torsoW}px;--torso-h:${torsoH}px;
+--head-w:${headW}px;--head-h:${headW}px;
+--arm-h:${armH}px;--leg-h:${legH}px;">
+
+```
+  <!-- Ailes -->
+  <div class="cb-wing left" style="display:${r.wings?'block':'none'};
+    background:${r.gem}33;border:1px solid ${r.gem}44;
+    box-shadow:0 0 12px ${r.glow}"></div>
+  <div class="cb-wing right" style="display:${r.wings?'block':'none'};
+    background:${r.gem}33;border:1px solid ${r.gem}44;
+    box-shadow:0 0 12px ${r.glow}"></div>
+
+  <!-- Tête -->
+  <div class="cb-head">
+    <div class="cb-hair"></div>
+    <div class="cb-eye left"></div>
+    <div class="cb-eye right"></div>
+    <!-- Halo -->
+    <div class="cb-halo" style="display:${r.halo?'block':'none'};
+      border-color:${r.gem};box-shadow:0 0 10px ${r.gem}"></div>
+  </div>
+
+  <!-- Torse -->
+  <div class="cb-torso">
+    <!-- Bras gauche -->
+    <div class="cb-arm left" style="background:${r.robe}"></div>
+    <!-- Bras droit -->
+    <div class="cb-arm right" style="background:${r.robe}"></div>
+    <!-- Implant cyber -->
+    <div class="cb-implant" style="display:${cs.faction==='V'?'block':'none'}"></div>
+  </div>
+
+  <!-- Jambes + Bottes -->
+  <div class="cb-legs">
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="cb-leg"></div>
+      <div class="cb-boot"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div class="cb-leg"></div>
+      <div class="cb-boot"></div>
+    </div>
+  </div>
+</div>
+```
+
+`;
+}
+
+function spawnMorphParticles() {
+const wrap = document.getElementById(‘char3DWrap’);
+if (!wrap) return;
+const race = RACES[cs.faction]?.[cs.raceIdx];
+const col  = race ? race.gem : ‘#FFD700’;
+for (let i = 0; i < 12; i++) {
+const p = document.createElement(‘div’);
+const px = (Math.random() - .5) * 80;
+const py = (Math.random() - .5) * 80;
+p.className = ‘morph-particle’;
+p.style.cssText = `left:50%;top:50%;--px:${px}px;--py:${py}px; background:${col};animation-delay:${i*.04}s;`;
+wrap.appendChild(p);
+setTimeout(() => { if(wrap.contains(p)) wrap.removeChild(p); }, 700 + i*40);
+}
+// Rebuild character avec nouvelles couleurs
+setTimeout(() => buildChar3D(wrap), 300);
+}
+
+// ════════════════════════════════════════════════════════
+// OVERRIDE updateChar — rebuild 3D perso quand race change
+// ════════════════════════════════════════════════════════
+const _origUpdateChar = typeof updateChar !== ‘undefined’ ? updateChar : null;
+window._afterRaceChange = function() {
+spawnMorphParticles();
+buildMap();
+renderQuests();
+};
+
+// ════════════════════════════════════════════════════════
+// INIT — au chargement de l’app
+// ════════════════════════════════════════════════════════
+const _origOpenApp = openApp;
+openApp = function() {
+_origOpenApp();
+// Charger quêtes sauvegardées
+try {
+const qSave = localStorage.getItem(‘pawaw_quests’);
+if (qSave) questProgress = JSON.parse(qSave);
+} catch(e) {}
+// Débloquer cycles selon niveau
+for (let i = 0; i <= Math.floor(ageLevel / 10); i++) unlockCycle(i);
+// Construire le perso 3D dans l’avatarBox
+setTimeout(() => {
+const wrap = document.getElementById(‘char3DWrap’);
+if (wrap) buildChar3D(wrap);
+buildMap();
+renderQuests();
+updateXPDisplay();
+}, 300);
+};
+
+// Override saveChar pour sauvegarder aussi les quêtes
+const _origSaveChar = saveChar;
+saveChar = function() {
+_origSaveChar();
+try { localStorage.setItem(‘pawaw_quests’, JSON.stringify(questProgress)); } catch(e) {}
+if (window._fbUser) saveToFirestore({ …cs, xp: xpVal, age: ageLevel, quests: questProgress });
+};
+
+// Override onRace pour rebuild 3D
+const _origOnRace = onRace;
+onRace = function() {
+_origOnRace();
+setTimeout(spawnMorphParticles, 100);
+};
+</script>
+
+<!-- Injecter le char3DWrap dans la fiche -->
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Remplacer l'avatarBox par le char3D
+  const avatarBox = document.getElementById('avatarBox');
+  if (avatarBox) {
+    const wrap = document.createElement('div');
+    wrap.id = 'char3DWrap';
+    avatarBox.parentNode.insertBefore(wrap, avatarBox);
+  }
+  // Patch switchMenu pour init map au premier clic
+  const _origSwitchMenu = switchMenu;
+  switchMenu = function(id, btn) {
+    _origSwitchMenu(id, btn);
+    if (id === 'map') { buildMap(); renderQuests(); }
+  };
 });
 </script>
 
