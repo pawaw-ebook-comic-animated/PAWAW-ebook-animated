@@ -3,67 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Comic Book Reader</title>
+    <title>Comic Book Reader</title>
     <style>
         body {
             margin: 0;
-            background: linear-gradient(270deg, #ff0080, #00b3ff);
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
         }
-        #comic-container {
-            perspective: 1000px;
-            width: 80vw;
-            height: 80vh;
-            position: relative;
-            cursor: pointer;
+        .book {
+            perspective: 1500px;
+            margin: 20px;
         }
-        .comic-page {
+        .book .page {
             width: 100%;
             height: 100%;
-            border: 1px solid #ccc;
-            background: white;
-            position: absolute;
-            transform-style: preserve-3d;
+            background-color: #fff;
+            border: 5px solid gold;
             transition: transform 0.6s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-        .comic-page:hover {
-            transform: rotateY(180deg);
+        .book:hover .page {
+            transform: rotateY(-20deg);
         }
-        /* Add styles for interactions and animations */
+        h1 {
+            background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbow 4s infinite;
+        }
+        @keyframes rainbow {
+            0% { background-position: 0%; }
+            100% { background-position: 100%; }
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <div id="comic-container">
-        <div class="comic-page">
-            <!-- Placeholder for the comic book content -->
-            <h1>Welcome to the 3D Comic Book Reader!</h1>
-            <p>Enjoy your comic book with immersive 3D experience.</p>
+    <div class="book">
+        <div class="page">
+            <h1>Comic Book Reader</h1>
+            <p>Welcome to the comic book reader! Hover over to flip pages!</p>
         </div>
     </div>
-    <script>
-        // Dynamic media loading system
-        function loadMedia(mediaType, src) {
-            const container = document.getElementById('comic-container');
-            let mediaElement;
-            if (mediaType === 'image') {
-                mediaElement = document.createElement('img');
-                mediaElement.src = src;
-            } else if (mediaType === 'video') {
-                mediaElement = document.createElement('video');
-                mediaElement.src = src;
-                mediaElement.controls = true;
-            } else if (mediaType === 'model') {
-                // Load 3D model (GLB) here
-                // Additional GLTF loader logic needed
-            }
-            container.appendChild(mediaElement);
-        }
 
-        // Add more functionalities as needed
+    <div id="myModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <img id="modalImg" src="" alt="" style="width:100%;">
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        function openModal(src) {
+            document.getElementById('modalImg').src = src;
+            document.getElementById('myModal').style.display = "block";
+        }
+        function closeModal() {
+            document.getElementById('myModal').style.display = "none";
+        }
     </script>
 </body>
 </html>
