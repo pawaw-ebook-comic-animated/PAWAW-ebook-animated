@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Comic Book Reader</title>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(270deg, #ff0080, #00b3ff);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        #comic-container {
+            perspective: 1000px;
+            width: 80vw;
+            height: 80vh;
+            position: relative;
+            cursor: pointer;
+        }
+        .comic-page {
+            width: 100%;
+            height: 100%;
+            border: 1px solid #ccc;
+            background: white;
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .comic-page:hover {
+            transform: rotateY(180deg);
+        }
+        /* Add styles for interactions and animations */
+    </style>
+</head>
+<body>
+    <div id="comic-container">
+        <div class="comic-page">
+            <!-- Placeholder for the comic book content -->
+            <h1>Welcome to the 3D Comic Book Reader!</h1>
+            <p>Enjoy your comic book with immersive 3D experience.</p>
+        </div>
+    </div>
+    <script>
+        // Dynamic media loading system
+        function loadMedia(mediaType, src) {
+            const container = document.getElementById('comic-container');
+            let mediaElement;
+            if (mediaType === 'image') {
+                mediaElement = document.createElement('img');
+                mediaElement.src = src;
+            } else if (mediaType === 'video') {
+                mediaElement = document.createElement('video');
+                mediaElement.src = src;
+                mediaElement.controls = true;
+            } else if (mediaType === 'model') {
+                // Load 3D model (GLB) here
+                // Additional GLTF loader logic needed
+            }
+            container.appendChild(mediaElement);
+        }
+
+        // Add more functionalities as needed
+    </script>
+</body>
+</html>
