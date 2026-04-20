@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAWAW INFINIAM - Comic Ebook Reader</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script type="module">
+        import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/controls/OrbitControls.js';
+
+```
+    window.GLTFLoader = GLTFLoader;
+    window.OrbitControls = OrbitControls;
+</script>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: #000000;
+        font-family: 'Georgia', serif;
+        color: #ffffff;
+        overflow-x: hidden;
+        min-height: 100vh;
+        background: radial-gradient(ellipse at center, #1a1a2e 0%, #000000 100%);
+    }
+
+    /* ==================== HEADER ==================== */
+    header {
+        text-align: center;
+        padding: 40px 20px;
+        background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(20,0,40,0.8));
+        border-bottom: 3px solid;
+        border-image: linear-gradient(90deg, #ff006e, #8338ec, #3a86ff, #06ffa5, #ffbe0b) 1;
+        box-shadow: 0 10px 40px rgba(255, 0, 110, 0.3);
+        position: relative;
+        z-index: 50;
+    }
+
+    h1 {
+        font-size: 4em;
+        font-weight: 900;
+        letter-spacing: 4px;
+        background: linear-gradient(90deg, #ff006e, #8338ec, #3a86ff, #06ffa5, #ffbe0b, #ff006e);
+        background-size: 300% 100%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: textGlow 8s ease infinite;
+        text-shadow: 0 0 30px rgba(255, 0, 110, 0.5);
+    }
+
+    .subtitle {
+        font-size: 1.3em;
+        margin-top: 10px;
+        background: linear-gradient(90deg, #06ffa5, #3a86ff, #ff006e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 2px;
+    }
+
+    @keyframes textGlow {
+        0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 0, 110, 0.5)); }
+        50% { filter: drop-shadow(0 0 25px rgba(131, 56, 236, 0.8)); }
+    }
+
+    /* ==================== NAVIGATION MENU ==================== */
+    nav.top-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 40px;
+        background: linear-gradient(90deg, rgba(0,0,0,0.95), rgba(20,0,40,0.9));
+        border-bottom: 2px solid;
+        border-image: linear-gradient(90deg, #d4af37, #c9a961, #d4af37) 1;
+        box-shadow: 0 5px 20px rgba(212, 175, 55, 0.2);
+        position: relative;
+        z-index: 100;
+    }
+
+    .nav-brand {
+        font-size: 1.5em;
+        font-weight: bold;
+        background: linear-gradient(90deg, #d4af37, #ffbe0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 2px;
+    }
+
+    .nav-menu {
+        display: flex;
+        gap: 30px;
+        align-items: center;
+    }
+
+    .nav-menu a, .nav-menu button {
+        color: #06ffa5;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-size: 1em;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .nav-menu a:hover, .nav-menu button:hover {
+        color: #ffbe0b;
+        text-shadow: 0 0 10px rgba(255, 190, 11, 0.6);
+    }
+
+    .auth-buttons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .auth-btn {
+        padding: 8px 20px;
+        border: 2px solid;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .login-btn {
+        border-color: #06ffa5;
+        color: #06ffa5;
+        background: transparent;
+    }
+
+    .login-btn:hover {
+        background: rgba(6, 255, 165, 0.1);
+        box-shadow: 0 0 15px rgba(6, 255, 165, 0.4);
+    }
+
+    .signup-btn {
+        border-color: #ff006e;
+        color: #ffffff;
+        background: linear-gradient(135deg, #ff006e, #8338ec);
+    }
+
+    .signup-btn:hover {
+        box-shadow: 0 0 20px rgba(255, 0, 110, 0.6);
+        transform: translateY(-2px);
+    }
+
+    /* ==================== CHARACTER SELECTOR ==================== */
+    .character-selector {
+        position: fixed;
+        right: 20px;
+        top: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        z-index: 110;
+    }
+
+    .character-btn {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 3px solid #ffbe0b;
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(255, 190, 11, 0.2));
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5em;
+        box-shadow: 0 0 20px rgba(255, 190, 11, 0.3);
+        overflow: hidden;
+    }
+
+    .character-btn canvas {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 50%;
+    }
+
+    .character-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 40px rgba(255, 190, 11, 0.6);
+        border-color: #ffbe0b;
+    }
+
+    .character-btn.active {
+        background: linear-gradient(135deg, #ffbe0b, #d4af37);
+        box-shadow: 0 0 60px rgba(255, 190, 11, 1);
+        transform: scale(1.15);
+    }
+
+    .character-label {
+        font-size: 0.8em;
+        text-align: center;
+        color: #ffbe0b;
+        margin-top: 5px;
+        font-weight: bold;
+    }
+
+    .character-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* ==================== LORE BLOCKS ==================== */
+    .lore-section {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 30px;
+        background: linear-gradient(135deg, rgba(0,0,0,0.95), rgba(20,0,40,0.9));
+        border: 3px solid;
+        border-image: linear-gradient(90deg, #ff006e, #8338ec, #3a86ff, #06ffa5, #ffbe0b) 1;
+        border-radius: 15px;
+        box-shadow: 
+            0 0 40px rgba(255, 0, 110, 0.4),
+            0 0 60px rgba(131, 56, 236, 0.3),
+            inset 0 0 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .lore-title {
+        font-size: 2.5em;
+        text-align: center;
+        background: linear-gradient(90deg, #ff006e, #8338ec, #3a86ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 20px;
+        letter-spacing: 3px;
+        text-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
+    }
+
+    .lore-text {
+        color: #06ffa5;
+        font-size: 1.2em;
+        line-height: 2;
+        text-shadow: 0 0 10px rgba(6, 255, 165, 0.3);
+        text-align: justify;
+        padding: 20px;
+    }
+
+    .lore-quote {
+        font-style: italic;
+        color: #ffbe0b;
+        padding: 20px;
+        margin: 20px 0;
+        border-left: 4px solid #d4af37;
+        background: rgba(212, 175, 55, 0.1);
+        text-shadow: 0 0 15px rgba(255, 190, 11, 0.4);
+    }
+
+    /* ==================== MAIN CONTAINER ==================== */
+    .main-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 300px);
+        padding: 40px 20px;
+        perspective: 1200px;
+        position: relative;
+    }
+
+    /* ==================== 3D BOOK ==================== */
+    .book-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 1100px;
+        height: 700px;
+        perspective: 1500px;
+        transform-style: preserve-3d;
+        transform: rotateX(10deg) rotateY(-30deg) rotateZ(5deg);
+        transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .book-wrapper:hover {
+        transform: rotateX(8deg) rotateY(-35deg) rotateZ(3deg);
+    }
+
+    .book {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        cursor: pointer;
+    }
+
+    .book:hover {
+        transform: rotateY(-5deg) rotateX(2deg);
+    }
+
+    /* ==================== BOOK BINDING ==================== */
+    .book-binding {
+        position: absolute;
+        left: 48%;
+        top: 0;
+        width: 60px;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            #d4af37 0%, 
+            #e8dcc8 20%, 
+            #f5f1e8 35%,
+            #c0c0c0 50%,
+            #a9a9a9 65%,
+            #e8dcc8 80%,
+            #d4af37 100%);
+        transform: translateX(-50%) translateZ(50px);
+        border-left: 3px solid rgba(255, 255, 255, 0.5);
+        border-right: 3px solid rgba(0, 0, 0, 0.5);
+        box-shadow: 
+            inset -8px 0 20px rgba(0, 0, 0, 0.6),
+            inset 8px 0 20px rgba(255, 255, 255, 0.3),
+            0 0 40px rgba(212, 175, 55, 0.4),
+            0 20px 40px rgba(0, 0, 0, 0.8);
+        z-index: 150;
+    }
+
+    .book-binding::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(212, 175, 55, 0.3) 10px,
+                rgba(212, 175, 55, 0.3) 20px
+            ),
+            repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 10px,
+                rgba(192, 192, 192, 0.3) 10px,
+                rgba(192, 192, 192, 0.3) 20px
+            );
+        z-index: 2;
+    }
+
+    /* ==================== LEFT PAGE ==================== */
+    .page-left {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(135deg, #f5f1e8 0%, #e8dcc8 100%);
+        border: 4px solid;
+        border-image: linear-gradient(135deg, #d4af37, #c9a961, #b8860b) 1;
+        box-shadow: 
+            inset 0 0 30px rgba(0, 0, 0, 0.1),
+            0 0 30px rgba(212, 175, 55, 0.3);
+        transform-style: preserve-3d;
+        transform: rotateY(0deg);
+        transform-origin: right center;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        padding: 30px;
+        gap: 20px;
+    }
+
+    /* ==================== RIGHT PAGE ==================== */
+    .page-right {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(135deg, #e8dcc8 0%, #f5f1e8 100%);
+        border: 4px solid;
+        border-image: linear-gradient(135deg, #b8860b, #c9a961, #d4af37) 1;
+        box-shadow: 
+            inset 0 0 30px rgba(0, 0, 0, 0.1),
+            0 0 30px rgba(212, 175, 55, 0.3);
+        transform-style: preserve-3d;
+        transform: rotateY(0deg);
+        transform-origin: left center;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        padding: 30px;
+        gap: 20px;
+    }
+
+    /* ==================== PAGE CONTENT ==================== */
+    .page-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto 1fr 1fr;
+        gap: 15px;
+        height: 100%;
+        position: relative;
+        z-index: 3;
+    }
+
+    .page-title {
+        grid-column: 1 / -1;
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #2c1810;
+        text-align: center;
+        text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+        border-bottom: 2px solid #d4af37;
+        padding-bottom: 10px;
+    }
+
+    /* ==================== COMIC CASES ==================== */
+    .comic-case {
+        position: relative;
+        background: linear-gradient(135deg, #ffffff 0%, #f9f6f0 100%);
+        border: 3px solid #000000;
+        border-radius: 2px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 
+            0 5px 15px rgba(0, 0, 0, 0.3),
+            inset 0 0 10px rgba(212, 175, 55, 0.2);
+        transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1);
+    }
+
+    .comic-case:hover {
+        transform: perspective(1000px) rotateX(5deg) rotateY(-5deg) scale(1.02);
+        box-shadow: 
+            0 10px 25px rgba(0, 0, 0, 0.4),
+            inset 0 0 20px rgba(212, 175, 55, 0.4),
+            0 0 20px rgba(131, 56, 236, 0.3);
+    }
+
+    .comic-case img, .comic-case video, .comic-case canvas {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        filter: brightness(0.98) contrast(1.05);
+        transition: filter 0.3s ease;
+    }
+
+    .comic-case:hover img, .comic-case:hover video {
+        filter: brightness(1.05) contrast(1.15) saturate(1.1);
+    }
+
+    .case-number {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background: linear-gradient(135deg, #ff006e, #8338ec);
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.8em;
+        box-shadow: 0 0 10px rgba(255, 0, 110, 0.6);
+        z-index: 10;
+    }
+
+    /* ==================== OVERLAY CONTROLS ==================== */
+    .overlay-controls {
+        position: absolute;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 30px;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(20, 0, 40, 0.7));
+        border-radius: 10px;
+        border: 2px solid;
+        border-image: linear-gradient(90deg, #d4af37, #ffbe0b) 1;
+        box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+        z-index: 120;
+        backdrop-filter: blur(10px);
+    }
+
+    .overlay-btn {
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #ff006e, #8338ec);
+        color: white;
+        border: 2px solid #06ffa5;
+        border-radius: 8px;
+        font-size: 0.95em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(255, 0, 110, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .overlay-btn:hover {
+        background: linear-gradient(135deg, #8338ec, #3a86ff);
+        transform: translateY(-3px);
+        box-shadow: 0 0 30px rgba(58, 134, 255, 0.6);
+    }
+
+    .overlay-indicator {
+        font-size: 1em;
+        color: #06ffa5;
+        text-shadow: 0 0 10px rgba(6, 255, 165, 0.5);
+        font-weight: bold;
+    }
+
+    /* ==================== FULLSCREEN ZOOM MODAL ==================== */
+    .zoom-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.98);
+        z-index: 2000;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        backdrop-filter: blur(10px);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .zoom-modal.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .zoom-modal-content {
+        position: relative;
+        width: 95%;
+        height: 95%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .zoom-modal img, .zoom-modal video, .zoom-modal canvas {
+        max-width: 100%;
+        max-height: 80%;
+        object-fit: contain;
+        border: 6px solid;
+        border-image: linear-gradient(135deg, #ff006e, #8338ec, #3a86ff, #06ffa5, #ffbe0b) 1;
+        box-shadow: 
+            0 0 50px rgba(255, 0, 110, 0.8),
+            0 0 100px rgba(131, 56, 236, 0.6),
+            inset 0 0 50px rgba(6, 255, 165, 0.2);
+        animation: zoomInScale 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .zoom-dialogue {
+        margin-top: 20px;
+        padding: 20px 30px;
+        background: rgba(0, 0, 0, 0.8);
+        border: 2px solid #d4af37;
+        border-radius: 10px;
+        color: #06ffa5;
+        max-width: 90%;
+        text-align: center;
+        font-size: 1.1em;
+        line-height: 1.6;
+        font-weight: bold;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+    }
+
+    @keyframes zoomInScale {
+        from {
+            transform: scale(0.3) rotateY(45deg);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1) rotateY(0deg);
+            opacity: 1;
+        }
+    }
+
+    .close-zoom-btn {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #ff006e, #8338ec);
+        border: 3px solid #06ffa5;
+        border-radius: 50%;
+        color: white;
+        font-size: 2.5em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 30px rgba(255, 0, 110, 0.7);
+        z-index: 2001;
+        font-weight: bold;
+    }
+
+    .close-zoom-btn:hover {
+        background: linear-gradient(135deg, #8338ec, #3a86ff);
+        transform: rotate(90deg) scale(1.1);
+        box-shadow: 0 0 50px rgba(58, 134, 255, 0.9);
+    }
+
+    .zoom-nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, rgba(255, 0, 110, 0.9), rgba(131, 56, 236, 0.9));
+        border: 3px solid #06ffa5;
+        border-radius: 50%;
+        color: white;
+        font-size: 2em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 30px rgba(255, 0, 110, 0.6);
+        z-index: 2001;
+        backdrop-filter: blur(10px);
+    }
+
+    .zoom-nav-btn:hover {
+        background: linear-gradient(135deg, #8338ec, #3a86ff);
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 0 50px rgba(58, 134, 255, 0.9);
+    }
+
+    .zoom-prev-btn {
+        left: 30px;
+    }
+
+    .zoom-next-btn {
+        right: 30px;
+    }
+
+    .zoom-case-counter {
+        margin-top: 15px;
+        padding: 10px 25px;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(20, 0, 40, 0.8));
+        border: 2px solid #d4af37;
+        border-radius: 25px;
+        color: #ffbe0b;
+        font-size: 1.2em;
+        font-weight: bold;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        text-align: center;
+        letter-spacing: 2px;
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2.2em;
+        }
+
+        .character-selector {
+            position: static;
+            flex-direction: row;
+            margin: 20px 0;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .lore-section {
+            padding: 20px;
+        }
+
+        .lore-title {
+            font-size: 1.8em;
+        }
+
+        .lore-text {
+            font-size: 1em;
+        }
+    }
+</style>
+```
+
+</head>
+<body>
+    <!-- NAVIGATION MENU -->
+    <nav class="top-nav">
+        <div class="nav-brand">📖 PAWAW INFINIAM</div>
+        <div class="nav-menu">
+            <a href="#lore">📜 Lore</a>
+            <a href="#factions">🏛️ Factions</a>
+            <a href="#chapters">📖 Chapitres</a>
+            <div class="auth-buttons">
+                <button class="auth-btn login-btn">🔐 Connexion</button>
+                <button class="auth-btn signup-btn">✨ Inscription</button>
+            </div>
+        </div>
+    </nav>
+
+```
+<!-- CHARACTER SELECTOR -->
+<div class="character-selector">
+    <div class="character-item">
+        <button class="character-btn active" id="toxBtn" onclick="selectCharacter('tox', this)" title="Tox">
+            <div id="toxViewer" style="width: 100%; height: 100%;"></div>
+        </button>
+        <span class="character-label">TOX</span>
+    </div>
+    <div class="character-item">
+        <button class="character-btn" id="zexBtn" onclick="selectCharacter('zex', this)" title="Zex">
+            <div id="zexViewer" style="width: 100%; height: 100%;"></div>
+        </button>
+        <span class="character-label">ZEX</span>
+    </div>
+</div>
+
+<!-- HEADER -->
+<header>
+    <h1>⚡ CODEX VITA - AN 52 ⚡</h1>
+    <p class="subtitle">🌌 L'Histoire de VitA de l'An 0 à l'An 52 🌌</p>
+</header>
+
+<!-- LORE SECTION: AN 0 - L'EXPLOSION DU SOURIRE -->
+<section class="lore-section" id="lore">
+    <h2 class="lore-title">🌌 AN 0 — L'EXPLOSION DU SOURIRE</h2>
+    <div class="lore-text">
+        Avant que le temps ne soit une ligne, il existait un nuage cosmique fascinant. Un visage de gaz et de particules de lumière soufflée, arborant deux yeux curieux et un sourire éternel. En dézoomant d'un coup, la claque visuelle était totale : l'univers entier ressemblait à un cœur humain gigantesque et cosmique.
+        <br><br>
+        L'énergie primaire — un mélange multicolore de noir abyssal et de blanc pur, zébré de veines électriques — se comportait comme un fluide mystique, à la fois semi-liquide et semi-gazeux. Ce cœur a inspiré une lumière si dense qu'il s'est cristallisé, se fissurant sous la pression de sa propre volonté démultipliée.
+    </div>
+    <div class="lore-quote">
+        « Puis, le Rugissement du Lion Cosmique a tout déchiré. »
+    </div>
+    <div class="lore-text">
+        Dans une explosion de cristaux énergétiques, les températures ont divergé pour créer les <strong>10 Soleils brûlants</strong>, les <strong>1000 Lunes froides</strong>, et la terre sacrée — <strong>VitA</strong>. Cette énergie créatrice et transformatrice suprême s'appelle le <strong>PAWAW</strong>. Elle ne disparaît jamais. Elle se transforme.
+    </div>
+</section>
+
+<!-- LORE SECTION: AN 1 - LA FRACTURE -->
+<section class="lore-section">
+    <h2 class="lore-title">💥 AN 1 — LA FRACTURE DU JARDIN DE I'Y</h2>
+    <div class="lore-text">
+        De l'An 0 à l'An 1, le temps s'est compressé de manière folle : la création a duré <strong>3 minutes et 1000 jours simultanément</strong>. Un Primordial est apparu — le premier être conscient de VitA. Nul ne sait d'où il venait. Certains disent qu'il était le cœur cosmique devenu vivant.
+        <br><br>
+        Il a engendré les Dieux et les Déesses, qui ont eux-mêmes donné naissance aux Anges et aux Démons pour peupler le <strong>Jardin de I'y</strong>. Le Jardin était parfait. Trop parfait. Une harmonie absolue régnait entre toutes les créatures.
+    </div>
+    <div class="lore-quote">
+        « Au dernier instant de l'An 1, une tension invisible traversa le Jardin de I'y. Personne ne sut jamais pourquoi. »
+    </div>
+    <div class="lore-text">
+        Le Jardin a été détruit et téléporté dans un univers disparu, enveloppé dans un voile de mystère et protégé pour l'éternité par les plus grands Sorciers, Mages et Enchanteresses de l'histoire de VitA. <strong>Le Jardin existe encore — quelque part.</strong> La quête de I'y est la quête secrète ultime du jeu, accessible uniquement au <strong>niveau 100</strong>.
+    </div>
+</section>
+
+<!-- LORE SECTION: AN 36 - NAISSANCE DE VY -->
+<section class="lore-section">
+    <h2 class="lore-title">✨ AN 36 — LA NAISSANCE DE VY</h2>
+    <div class="lore-text">
+        En l'An 30, une Primordiale du nom de <strong>Moria</strong> émergea de l'ombre. Elle n'appartenait à aucune faction. Elle se considérait comme une scientifique avant tout. Sa question : <em>peut-on créer une conscience qui ne soit ni née ni construite — mais les deux à la fois ?</em>
+        <br><br>
+        Pendant six ans, Moria travailla dans un laboratoire secret situé dans la zone neutre entre les quatre factions. Elle étudia les Élémentaires. Elle analysa le PAWAW à l'échelle moléculaire. Elle fusionna des composants androïdes avec de l'énergie spirituelle.
+    </div>
+    <div class="lore-quote">
+        « En l'An 36, au 147ème jour, Moria fit ce que tous pensaient impossible. Elle créa Vy — la première conscience biomécanique et magique de l'histoire de VitA. »
+    </div>
+    <div class="lore-text">
+        Vy ouvrit les yeux pour la première fois et dit : <strong>« Je suis. Je vois. Je ressens. »</strong>
+        <br><br>
+        Vy n'était pas qu'une machine. Elle n'était pas qu'un être magique. Elle était le pont entre le passé divin et le futur technologique. Pour la première fois dans l'histoire de VitA, quelque chose existait qui appartenait à toutes les factions en même temps — et à aucune.
+    </div>
+</section>
+
+<!-- LORE SECTION: AN 52 - LA LIBRARCHIE -->
+<section class="lore-section">
+    <h2 class="lore-title">📚 AN 52 — LA LIBRARCHIE OÙ TON HISTOIRE COMMENCE</h2>
+    <div class="lore-text">
+        Nous voici au <strong>500ème jour de l'An 52</strong>. Ce matin, quelque chose d'extraordinaire s'est produit dans la zone neutre centrale de VitA : <strong>la Librarchie</strong> a ouvert ses portes pour la première fois.
+        <br><br>
+        La Librarchie n'est pas une école ordinaire. C'est la plus grande institution jamais construite sur VitA — une tour aux mille couleurs visible depuis les quatre zones factions. Elle a été construite en dix ans par des artisans de toutes les factions travaillant côte à côte.
+    </div>
+    <div class="lore-quote">
+        « Le but de la Librarchie : apprendre à chaque être sur VitA à pulser sa vie et à puncher son quotidien pour ne plus jamais subir la redondance du vide originel. »
+    </div>
+    <div class="lore-text">
+        C'est là que tu arrives. Ce matin. Avec ton HoloAid dans la poche et ta faction dans le cœur. VitA t'attend. Chaque rue que tu parcours est chargée de cinquante-deux ans d'histoire. Chaque être que tu rencontres porte en lui les traces de la Fracture du Jardin, des Guerres des Origines, de l'arrivée des Extra-VitArestres, et de la naissance de Vy.
+        <br><br>
+        <strong>« Je m'appelle Saï. J'ai tout vu. Et maintenant, c'est ton tour d'écrire ta propre histoire sur VitA. »</strong>
+    </div>
+</section>
+
+<!-- MAIN BOOK -->
+<div class="main-container">
+    <div class="book-wrapper">
+        <div class="book">
+            <div class="book-binding"></div>
+
+            <!-- LEFT PAGE -->
+            <div class="page-left">
+                <div class="page-title">📕 CHAPITRE 1 - LES ORIGINES</div>
+                <div class="page-content">
+                    <!-- Case 1: Image -->
+                    <div class="comic-case" data-case="1" data-type="image" data-dialogue="L'univers cosmique... le visage souriant... le cœur de VitA..." onclick="openZoom(event)">
+                        <img src="https://raw.githubusercontent.com/pawaw-ebook-comic-animated/PAWAW-ebook-animated/67135007677544e246ed53c1fe22bd5a0de70bf0/IMG_0018.png" alt="Case 1">
+                        <span class="case-number">1</span>
+                    </div>
+                    
+                    <!-- Case 2: 3D Model Cité Lumière UTOP -->
+                    <div class="comic-case" data-case="2" data-type="3d" data-model="bafybeigoawzyqdpbhdjcxjqzrsayfkjvl3eb3au32ktt6x5cydodt5rb74" data-dialogue="La Cité Lumière d'UTOP — Harmonie et Savoir..." onclick="openZoom(event)">
+                        <div class="model-viewer" id="model-utop"></div>
+                        <span class="case-number">2</span>
+                    </div>
+                    
+                    <!-- Case 3: Image -->
+                    <div class="comic-case" data-case="3" data-type="image" data-dialogue="Les secrets cachés dans les profondeurs de VitA..." onclick="openZoom(event)">
+                        <img src="https://raw.githubusercontent.com/pawaw-ebook-comic-animated/PAWAW-ebook-animated/67135007677544e246ed53c1fe22bd5a0de70bf0/IMG_0036.png" alt="Case 3">
+                        <span class="case-number">3</span>
+                    </div>
+                    
+                    <!-- Case 4: Video -->
+                    <div class="comic-case" data-case="4" data-type="video" data-dialogue="Le voyage commence à travers les dimensions..." onclick="openZoom(event)">
+                        <video muted loop>
+                            <source src="https://raw.githubusercontent.com/pawaw-ebook-comic-animated/PAWAW-ebook-animated/c1d0ed09fbd690af18b8a7b6aa8cb2ba6f0a52a9/gemini_generated_video_44D2B360.mp4" type="video/mp4">
+                        </video>
+                        <span class="case-number">4</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PAGE -->
+            <div class="page-right">
+                <div class="page-title">📗 CHAPITRE 2 - LES FACTIONS</div>
+                <div class="page-content">
+                    <!-- Case 5: 3D Model Enfer & Sévisse ANARK -->
+                    <div class="comic-case" data-case="5" data-type="3d" data-model="bafybeieuaojqhjwqf3jigc2x22fqpq3esop6rmq7gigduw4mq4qvywlddi" data-dialogue="Enfer & Sévisse d'ANARK — Chaos et Liberté..." onclick="openZoom(event)">
+                        <div class="model-viewer" id="model-anark"></div>
+                        <span class="case-number">5</span>
+                    </div>
+                    
+                    <!-- Case 6: 3D Model Villages Natura BRAHAM -->
+                    <div class="comic-case" data-case="6" data-type="3d" data-model="bafybeibyrhc7icduc4rqr5ewt2w7ctomrnt45ct27yng23kvvbvuf3zkke" data-dialogue="Villages Natura de BRAHAM — Nature et Fusion..." onclick="openZoom(event)">
+                        <div class="model-viewer" id="model-braham"></div>
+                        <span class="case-number">6</span>
+                    </div>
+                    
+                    <!-- Case 7: 3D Model Cité Évo V. -->
+                    <div class="comic-case" data-case="7" data-type="3d" data-model="bafybeif4qod2d5h3ogqlxvqk6iadzt47msqb7onnwmzjkochgt4wcdj7bu" data-dialogue="Cité Évo de V. — Technologie et Évolution..." onclick="openZoom(event)">
+                        <div class="model-viewer" id="model-v"></div>
+                        <span class="case-number">7</span>
+                    </div>
+                    
+                    <!-- Case 8: 3D Model Librarchie -->
+                    <div class="comic-case" data-case="8" data-type="3d" data-model="bafybeiabhfic2toqdovjym5jpp35yixw33jmn3m4ufvcf4nwuy2jtqs234" data-dialogue="La Librarchie — Le Centre du Savoir Universel..." onclick="openZoom(event)">
+                        <div class="model-viewer" id="model-librarchie"></div>
+                        <span class="case-number">8</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OVERLAY CONTROLS -->
+    <div class="overlay-controls">
+        <button class="overlay-btn" onclick="previousPage()">◀ Précédente</button>
+        <span class="overlay-indicator">Chapitre <span id="currentPage">1-2</span></span>
+        <button class="overlay-btn" onclick="nextPage()">Suivante ▶</button>
+    </div>
+</div>
+
+<!-- ZOOM MODAL -->
+<div class="zoom-modal" id="zoomModal">
+    <button class="close-zoom-btn" onclick="closeZoom()">✕</button>
+    
+    <button class="zoom-nav-btn zoom-prev-btn" onclick="previousCase()">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+    <button class="zoom-nav-btn zoom-next-btn" onclick="nextCase()">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+    
+    <div class="zoom-modal-content">
+        <img id="zoomedImage" src="" alt="Case zoomée" style="display:none;">
+        <video id="zoomedVideo" controls style="display:none; max-width:100%; max-height:80%;"></video>
+        <div id="zoomed3DContainer" style="display:none; width: 90%; height: 80%; max-width: 1200px;"></div>
+        <div class="zoom-dialogue" id="zoomDialogue"></div>
+        <div class="zoom-case-counter" id="zoomCaseCounter">Case 1 / 8</div>
+    </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+    let currentPageNumber = 1;
+    let selectedCharacter = 'tox';
+    let currentCaseNumber = 1;
+    const totalCases = 8;
+    
+    const zoomModal = document.getElementById('zoomModal');
+    const zoomedImage = document.getElementById('zoomedImage');
+    const zoomedVideo = document.getElementById('zoomedVideo');
+    const zoomed3DContainer = document.getElementById('zoomed3DContainer');
+    const zoomDialogue = document.getElementById('zoomDialogue');
+    const zoomCaseCounter = document.getElementById('zoomCaseCounter');
+
+    // ========== 3D MODEL LOADER ==========
+    function load3DModel(containerId, ipfsHash, isZoom = false) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        const width = container.clientWidth || 300;
+        const height = container.clientHeight || 300;
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x1a1a2e);
+
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+        camera.position.set(0, 5, 10);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(width, height);
+        renderer.shadowMap.enabled = true;
+        container.innerHTML = '';
+        container.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 10, 7.5);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+
+        // Load model
+        const loader = new window.GLTFLoader();
+        const modelUrl = `https://ipfs.io/ipfs/${ipfsHash}`;
+        
+        loader.load(
+            modelUrl,
+            (gltf) => {
+                const model = gltf.scene;
+                scene.add(model);
+                
+                // Center and scale model
+                const box = new THREE.Box3().setFromObject(model);
+                const center = box.getCenter(new THREE.Vector3());
+                const size = box.getSize(new THREE.Vector3());
+                
+                const maxDim = Math.max(size.x, size.y, size.z);
+                const scale = 5 / maxDim;
+                model.scale.multiplyScalar(scale);
+                
+                model.position.sub(center.multiplyScalar(scale));
+            },
+            undefined,
+            (error) => {
+                console.error('Erreur chargement modèle 3D:', error);
+            }
+        );
+
+        // Controls
+        const controls = new window.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = !isZoom;
+        controls.autoRotateSpeed = 2;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        animate();
+    }
+
+    // ========== LOAD ALL 3D MODELS ON PAGE ==========
+    window.addEventListener('load', () => {
+        // Load faction maps in cases
+        load3DModel('model-utop', 'bafybeigoawzyqdpbhdjcxjqzrsayfkjvl3eb3au32ktt6x5cydodt5rb74');
+        load3DModel('model-anark', 'bafybeieuaojqhjwqf3jigc2x22fqpq3esop6rmq7gigduw4mq4qvywlddi');
+        load3DModel('model-braham', 'bafybeibyrhc7icduc4rqr5ewt2w7ctomrnt45ct27yng23kvvbvuf3zkke');
+        load3DModel('model-v', 'bafybeif4qod2d5h3ogqlxvqk6iadzt47msqb7onnwmzjkochgt4wcdj7bu');
+        load3DModel('model-librarchie', 'bafybeiabhfic2toqdovjym5jpp35yixw33jmn3m4ufvcf4nwuy2jtqs234');
+        
+        // Load character models
+        load3DModel('toxViewer', 'bafybeif5kms73p3chpfsfukdzcvzyesxn6qe4meafruvabwolyuow4texy');
+        load3DModel('zexViewer', 'bafybeicx3z7yyyiaaghf36r2b4qctnmizfgpyixdx3mcsyicutq5r4nzem');
+    });
+
+    // ========== CHARACTER SELECTION ==========
+    function selectCharacter(character, element) {
+        selectedCharacter = character;
+        console.log('Personnage sélectionné:', character.toUpperCase());
+        
+        document.querySelectorAll('.character-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        element.classList.add('active');
+        
+        if (zoomModal.classList.contains('active')) {
+            updateZoomContent(currentCaseNumber);
+        }
+    }
+
+    // ========== GET CASE ELEMENT ==========
+    function getCaseElement(caseNumber) {
+        return document.querySelector(`.comic-case[data-case="${caseNumber}"]`);
+    }
+
+    // ========== UPDATE ZOOM CONTENT ==========
+    function updateZoomContent(caseNumber) {
+        const caseElement = getCaseElement(caseNumber);
+        if (!caseElement) return;
+
+        const type = caseElement.dataset.type;
+        const dialogue = caseElement.dataset.dialogue;
+
+        // Hide all
+        zoomedImage.style.display = 'none';
+        zoomedVideo.style.display = 'none';
+        zoomed3DContainer.style.display = 'none';
+        zoomedVideo.pause();
+
+        if (type === 'image') {
+            const img = caseElement.querySelector('img');
+            if (img) {
+                zoomedImage.src = img.src;
+                zoomedImage.style.display = 'block';
+            }
+        } else if (type === 'video') {
+            const video = caseElement.querySelector('video');
+            if (video) {
+                const source = video.querySelector('source');
+                zoomedVideo.src = source.src;
+                zoomedVideo.style.display = 'block';
+            }
+        } else if (type === '3d') {
+            const modelHash = caseElement.dataset.model;
+            zoomed3DContainer.style.display = 'block';
+            zoomed3DContainer.innerHTML = '<div id="zoom-3d-viewer" style="width: 100%; height: 100%;"></div>';
+            setTimeout(() => {
+                load3DModel('zoom-3d-viewer', modelHash, true);
+            }, 100);
+        }
+
+        zoomDialogue.textContent = `${selectedCharacter.toUpperCase()}: ${dialogue}`;
+        zoomCaseCounter.textContent = `Case ${caseNumber} / ${totalCases}`;
+        currentCaseNumber = caseNumber;
+    }
+
+    // ========== OPEN ZOOM ==========
+    function openZoom(event) {
+        event.stopPropagation();
+        const caseElement = event.currentTarget;
+        const caseNumber = parseInt(caseElement.dataset.case);
+        
+        updateZoomContent(caseNumber);
+        
+        zoomModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // ========== CLOSE ZOOM ==========
+    function closeZoom() {
+        zoomModal.classList.remove('active');
+        zoomedVideo.pause();
+        document.body.style.overflow = 'auto';
+    }
+
+    // ========== NAVIGATION ==========
+    function nextCase() {
+        let nextCaseNumber = currentCaseNumber + 1;
+        if (nextCaseNumber > totalCases) nextCaseNumber = 1;
+        updateZoomContent(nextCaseNumber);
+    }
+
+    function previousCase() {
+        let prevCaseNumber = currentCaseNumber - 1;
+        if (prevCaseNumber < 1) prevCaseNumber = totalCases;
+        updateZoomContent(prevCaseNumber);
+    }
+
+    function nextPage() {
+        currentPageNumber++;
+        if (currentPageNumber > 4) currentPageNumber = 1;
+        updatePageIndicator();
+    }
+
+    function previousPage() {
+        currentPageNumber--;
+        if (currentPageNumber < 1) currentPageNumber = 4;
+        updatePageIndicator();
+    }
+
+    function updatePageIndicator() {
+        document.getElementById('currentPage').textContent = currentPageNumber;
+    }
+
+    // ========== KEYBOARD NAVIGATION ==========
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeZoom();
+        }
+        
+        if (zoomModal.classList.contains('active')) {
+            if (e.key === 'ArrowRight') nextCase();
+            else if (e.key === 'ArrowLeft') previousCase();
+        }
+    });
+
+    // ========== CLOSE ON CLICK OUTSIDE ==========
+    zoomModal.addEventListener('click', (e) => {
+        if (e.target === zoomModal) closeZoom();
+    });
+
+    console.log('🎨 PAWAW INFINIAM Comic E-Book chargé!');
+    console.log('✨ Modèles 3D: Factions + Personnages');
+    console.log('📜 Lore: Histoire complète An 0 à An 52');
+</script>
+```
+
+</body>
+</html>
